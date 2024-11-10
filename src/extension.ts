@@ -66,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 			// Find the code block
 			const sourceMatch = sourceRegex.exec(text);
 			if (!sourceMatch) {
-				vscode.window.showErrorMessage(`No code block matched the source regex in file ${file.fsPath}`);
+				vscode.window.showErrorMessage(`No code block matched the source regex in file ${file.fsPath} ${sourceMatch} ${sourceRegex}`);
 				continue;
 			}
 			const codeBlock = sourceMatch[0];
