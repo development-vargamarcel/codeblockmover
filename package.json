@@ -14,10 +14,34 @@
   "contributes": {
     "commands": [
       {
-        "command": "codeblockmover.helloWorld",
-        "title": "Hello World"
+        "command": "codeBlockMover.moveBlockInFolder",
+        "title": "Move Code Block in Folder"
+      },
+      {
+        "command": "codeBlockMover.setSourceRegex",
+        "title": "Set Source Regex for Code Block Selection"
+      },
+      {
+        "command": "codeBlockMover.setDestinationRegex",
+        "title": "Set Destination Regex for Insertion Point"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Code Block Mover Settings",
+      "properties": {
+        "codeBlockMover.sourceRegex": {
+          "type": "string",
+          "default": "let {[sS]*?$props();?",
+          "description": "Regular expression to match the code block to be moved."
+        },
+        "codeBlockMover.destinationRegex": {
+          "type": "string",
+          "default": "^<script[^>]*>.*s*$",
+          "description": "Regular expression to find the line where the code block will be moved."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
