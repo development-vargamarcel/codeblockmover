@@ -37,6 +37,10 @@ const createRegexGivenRegexPatternOrSearchParameters = (regexPatternOrSearchPara
 		return new RegExp(regexPatternOrSearchParameters, 'm');
 	}
 };
+function isBinaryFile(uri: vscode.Uri): boolean {
+	const fileContent = fs.readFileSync(uri.fsPath);
+	return fileContent.some(byte => byte > 127); // Check for non-ASCII characters
+}
 export function activate(context: vscode.ExtensionContext) {
 
 	// Command to move code block based on user regexes in selected folder
@@ -94,6 +98,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// Process each file in the folder
 		for (const file of files) {
+			if (isBinaryFile(file)) {
+				vscode.window.showErrorMessage(`File ${file.fsPath} is a binary file and cannot be processed.`);
+				continue;
+
+			}
 			const document = await vscode.workspace.openTextDocument(file);
 			const editor = await vscode.window.showTextDocument(document);
 
@@ -103,7 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
 			// Find the code block
 			const sourceMatch = sourceRegex.exec(text);
 			if (!sourceMatch) {
-				vscode.window.showErrorMessage(`No code block matched the source regex in file ${file.fsPath} ${sourceMatch} ${sourceRegex}`);
+				//vscode.window.showErrorMessage(`No code block matched the source regex in file ${file.fsPath} ${sourceMatch} ${sourceRegex}`);
 				console.log('No code block matched the source regex in file', sourceMatch, sourceRegex);
 				continue;
 			}
@@ -114,7 +123,9 @@ export function activate(context: vscode.ExtensionContext) {
 			// Find the destination line
 			const destinationMatch = destinationRegex.exec(text);
 			if (!destinationMatch) {
-				vscode.window.showErrorMessage(`No line matched the destination regex in file ${file.fsPath}`);
+				//vscode.window.showErrorMessage(`No code block matched the destination regex in file ${file.fsPath}`);
+				console.log('No code block matched the destination regex in file', destinationMatch, destinationRegex);
+
 				continue;
 			}
 			const destinationPositionStart = document.positionAt(destinationMatch.index);
