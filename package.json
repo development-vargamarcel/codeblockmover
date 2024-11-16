@@ -15,27 +15,27 @@
     "commands": [
       {
         "command": "codeBlockMover.moveBlockInFolder",
-        "title": "Move Code Block in Folder"
+        "title": "Move Code Block For Each File In Folder"
       },
       {
-        "command": "codeBlockMover.setSourceRegex",
-        "title": "Set Source Regex for Code Block Selection"
+        "command": "codeBlockMover.setSourceRegexOrSearchParameters",
+        "title": "Set Source Regex Or Search Parameters for Code Block Selection"
       },
       {
-        "command": "codeBlockMover.setDestinationRegex",
-        "title": "Set Destination Regex for Insertion Point"
+        "command": "codeBlockMover.setDestinationRegexOrSearchParameters",
+        "title": "Set Destination Regex Or Search Parameters for Insertion Point"
       }
     ],
     "configuration": {
       "type": "object",
       "title": "Code Block Mover Settings",
       "properties": {
-        "codeBlockMover.sourceRegex": {
+        "codeBlockMover.sourceRegexOrSearchParameters": {
           "type": "string",
           "default": "/** @type ... $props();",
           "description": "Regular expression to match the code block to be moved."
         },
-        "codeBlockMover.destinationRegex": {
+        "codeBlockMover.destinationRegexOrSearchParameters": {
           "type": "string",
           "default": "<script ... >",
           "description": "Regular expression to find the line where the code block will be moved."

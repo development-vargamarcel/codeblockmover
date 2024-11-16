@@ -57,8 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// Get stored regex patterns from the configuration
 		const config = vscode.workspace.getConfiguration('codeBlockMover');
-		const defaultSourceRegexPatternOrSearchParameters = config.get<string>('sourceRegex') || '';
-		const defaultDestinationRegexPatternOrSearchParameters = config.get<string>('destinationRegex') || '';
+		const defaultSourceRegexPatternOrSearchParameters = config.get<string>('sourceRegexOrSearchParameters') || '';
+		const defaultDestinationRegexPatternOrSearchParameters = config.get<string>('destinationRegexOrSearchParameters') || '';
 
 		// Prompt for source regex, default to configuration if available
 		const sourceRegexPatternOrSearchParameters = await vscode.window.showInputBox({
