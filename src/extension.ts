@@ -46,8 +46,8 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		// Compile the regular expressions
-		const sourceRegex = new RegExp(sourceRegexPattern, 'gm');
-		const destinationRegex = new RegExp(destinationRegexPattern, 'gm');
+		const sourceRegex = new RegExp(sourceRegexPattern, 'm');
+		const destinationRegex = new RegExp(destinationRegexPattern, 'm');
 
 		// Read all files in the selected folder
 		const files = getFilesInDirectory(folderPath);
@@ -62,11 +62,13 @@ export function activate(context: vscode.ExtensionContext) {
 			const editor = await vscode.window.showTextDocument(document);
 
 			const text = document.getText();
+			console.log('Processing file:', file.fsPath, { text });
 
 			// Find the code block
 			const sourceMatch = sourceRegex.exec(text);
 			if (!sourceMatch) {
 				vscode.window.showErrorMessage(`No code block matched the source regex in file ${file.fsPath} ${sourceMatch} ${sourceRegex}`);
+				console.log('No code block matched the source regex in file', sourceMatch, sourceRegex);
 				continue;
 			}
 			const codeBlock = sourceMatch[0];
@@ -79,14 +81,15 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showErrorMessage(`No line matched the destination regex in file ${file.fsPath}`);
 				continue;
 			}
-			const destinationPosition = document.positionAt(destinationMatch.index);
-
+			const destinationPositionStart = document.positionAt(destinationMatch.index);
+			const destinationPositionEnd = document.positionAt(destinationMatch.index + destinationMatch[0].length);
+			console.log({ destinationMatch }, { destinationPositionStart }, { destinationPositionEnd })
 			// Make edits to move the code block
 			await editor.edit(editBuilder => {
 				// Remove the original code block
 				editBuilder.delete(new vscode.Range(codeBlockStart, codeBlockEnd));
 				// Insert the code block at the destination line
-				editBuilder.insert(destinationPosition, `\n${codeBlock}\n`);
+				editBuilder.insert(destinationPositionEnd, `\n${codeBlock}\n`);
 			});
 		}
 

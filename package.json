@@ -32,7 +32,7 @@
       "properties": {
         "codeBlockMover.sourceRegex": {
           "type": "string",
-          "default": "let {[sS]*?$props();?",
+          "default": "let\\s*\\{[\\s\\S]*?\\}\\s*=\\s*\\$props\\(\\);",
           "description": "Regular expression to match the code block to be moved."
         },
         "codeBlockMover.destinationRegex": {
