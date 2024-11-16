@@ -1,7 +1,42 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+/**
+ * Creates a regex pattern based on the provided start and end parts.
+ * @param stringStartPart - The starting string (can include special characters and new lines).
+ * @param stringEndPart - The ending string (can include special characters and new lines).
+ * @returns A RegExp object that matches any text between the start and end parts.
+ */
+function createRegex(
+	stringStartPart: string,
+	stringEndPart: string
+): RegExp {
+	// Helper function to escape special characters for regex
+	const escapeRegex = (str: string): string =>
+		str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+	// Escape the input strings to handle special characters and new lines
+	const escapedStart = escapeRegex(stringStartPart);
+	const escapedEnd = escapeRegex(stringEndPart);
+
+	// Construct the regex pattern
+	const pattern = `${escapedStart}[\\s\\S]*?${escapedEnd}`;
+
+	// Return a RegExp object
+	return new RegExp(pattern, "g");
+}
+
+// Example usage
+//const regex = createRegex("/** @type", "$props();");
+
+const createRegexGivenRegexPatternOrSearchParameters = (regexPatternOrSearchParameters: string): RegExp => {
+	if (regexPatternOrSearchParameters.includes(' ... ')) {
+		const regexCreationArguments: string[] = regexPatternOrSearchParameters.split(' ... ') || [];
+		return createRegex(regexCreationArguments[0], regexCreationArguments[1]);
+	} else {
+		return new RegExp(regexPatternOrSearchParameters, 'm');
+	}
+};
 export function activate(context: vscode.ExtensionContext) {
 
 	// Command to move code block based on user regexes in selected folder
@@ -22,32 +57,33 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// Get stored regex patterns from the configuration
 		const config = vscode.workspace.getConfiguration('codeBlockMover');
-		const defaultSourceRegex = config.get<string>('sourceRegex') || '';
-		const defaultDestinationRegex = config.get<string>('destinationRegex') || '';
+		const defaultSourceRegexPatternOrSearchParameters = config.get<string>('sourceRegex') || '';
+		const defaultDestinationRegexPatternOrSearchParameters = config.get<string>('destinationRegex') || '';
 
 		// Prompt for source regex, default to configuration if available
-		const sourceRegexPattern = await vscode.window.showInputBox({
+		const sourceRegexPatternOrSearchParameters = await vscode.window.showInputBox({
 			prompt: 'Enter the regex to select the code block',
-			value: defaultSourceRegex,
+			value: defaultSourceRegexPatternOrSearchParameters,
 		});
-		if (!sourceRegexPattern) {
+		if (!sourceRegexPatternOrSearchParameters) {
 			vscode.window.showErrorMessage("Source regex pattern is required");
 			return;
 		}
 
 		// Prompt for destination regex, default to configuration if available
-		const destinationRegexPattern = await vscode.window.showInputBox({
+		const destinationRegexPatternOrSearchParameters = await vscode.window.showInputBox({
 			prompt: 'Enter the regex to find the destination line',
-			value: defaultDestinationRegex,
+			value: defaultDestinationRegexPatternOrSearchParameters,
 		});
-		if (!destinationRegexPattern) {
+		if (!destinationRegexPatternOrSearchParameters) {
 			vscode.window.showErrorMessage("Destination regex pattern is required");
 			return;
 		}
 
+
 		// Compile the regular expressions
-		const sourceRegex = new RegExp(sourceRegexPattern, 'm');
-		const destinationRegex = new RegExp(destinationRegexPattern, 'm');
+		const sourceRegex = createRegexGivenRegexPatternOrSearchParameters(sourceRegexPatternOrSearchParameters);
+		const destinationRegex = createRegexGivenRegexPatternOrSearchParameters(destinationRegexPatternOrSearchParameters);
 
 		// Read all files in the selected folder
 		const files = getFilesInDirectory(folderPath);
@@ -83,7 +119,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			const destinationPositionStart = document.positionAt(destinationMatch.index);
 			const destinationPositionEnd = document.positionAt(destinationMatch.index + destinationMatch[0].length);
-			console.log({ destinationMatch }, { destinationPositionStart }, { destinationPositionEnd })
+			console.log({ destinationMatch }, { destinationPositionStart }, { destinationPositionEnd });
 			// Make edits to move the code block
 			await editor.edit(editBuilder => {
 				// Remove the original code block
