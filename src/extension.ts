@@ -113,7 +113,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const sourceMatch = sourceRegex.exec(text);
 			if (!sourceMatch) {
 				//vscode.window.showErrorMessage(`No code block matched the source regex in file ${file.fsPath} ${sourceMatch} ${sourceRegex}`);
-				console.log('No code block matched the source regex in file', file.fsPath, sourceMatch, sourceRegex);
+				console.log('No code block matched the source regex in file', file.fsPath, sourceMatch, sourceRegex, text);
 				continue;
 			}
 			const codeBlock = sourceMatch[0];
@@ -124,7 +124,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const destinationMatch = destinationRegex.exec(text);
 			if (!destinationMatch) {
 				//vscode.window.showErrorMessage(`No code block matched the destination regex in file ${file.fsPath}`);
-				console.log('No code block matched the destination regex in file', file.fsPath, destinationMatch, destinationRegex);
+				console.log('No code block matched the destination regex in file', file.fsPath, destinationMatch, destinationRegex, text);
 
 				continue;
 			}
