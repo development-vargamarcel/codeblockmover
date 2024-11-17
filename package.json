@@ -1,8 +1,9 @@
 {
   "name": "codeblockmover",
-  "displayName": "codeblockmover",
-  "description": "move code blocks based on regex",
-  "version": "0.0.1",
+  "displayName": "Code Block Mover",
+  "publisher": "developmentvargamarcel",
+  "description": "move code blocks based on regex or search parameters",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.95.0"
   },
